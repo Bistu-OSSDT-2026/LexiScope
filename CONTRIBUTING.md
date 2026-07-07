@@ -1,6 +1,4 @@
 ---
-
-```markdown
 # 贡献指南（Contributing Guide）
 
 感谢你对 **LexiScope** 项目的兴趣！本文档旨在规范本项目的协作流程，确保每一位成员都能高效、有序地参与开发。
