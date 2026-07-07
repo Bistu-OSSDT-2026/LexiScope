@@ -133,3 +133,5 @@ def function_name(text):
 ---
 
 **再次感谢你的贡献！让我们一起让 LexiScope 变得更好。** 🚀
+
+---
