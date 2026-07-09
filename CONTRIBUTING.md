@@ -127,7 +127,7 @@ def function_name(text):
 
 1. 确保 `main` 分支所有自动化检查（CI）通过。
 2. 更新 `README.md` 中的使用说明。
-3. 在 GitHub 上创建 **Tag** 并发布 **Release**（版本号如 `v0.1.0`）。
+3. 在 GitHub 上创建 **Tag** 并发布 **Release**（版本号如 `v1.0`）。
 4. Release Notes 中需包含：本版本功能清单、使用方法、已知问题（如果有）。
 
 ---
