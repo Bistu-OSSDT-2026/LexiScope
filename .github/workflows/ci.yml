@@ -1,0 +1,31 @@
+name: 基础检查
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      - name: 安装依赖
+        run: |
+          pip install flask jieba python-docx
+      - name: 检查所有 Python 文件语法
+        run: |
+          for file in *.py; do
+            echo "检查 $file ..."
+            python -m py_compile "$file" && echo "✅ $file 语法正确"
+          done
+      - name: 列出所有 Python 文件
+        run: |
+          echo "📁 仓库中的 Python 文件："
+          ls -la *.py
+          echo "✅ 检查完成，所有 Python 文件均存在"
