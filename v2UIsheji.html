@@ -1,0 +1,448 @@
+# ============================================================
+# === 队员E：前端设计模块===
+# ============================================================
+
+home_html = """
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LexiScope</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        .header h1 { font-size: 3.5rem; color: #4a5568; margin-bottom: 15px; font-weight: 700; }
+        .header p { color: #718096; font-size: 1.3rem; max-width: 800px; margin: 0 auto; line-height: 1.6; }
+        .upload-section {
+            background: white;
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .input-methods {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .method-btn {
+            padding: 16px 32px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 350px;
+        }
+        .method-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+        .method-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .file-input-container, .text-input-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .file-input-container.active, .text-input-container.active { display: flex; }
+        .file-input-wrapper { display: inline-block; position: relative; margin-bottom: 15px; }
+        .file-input { display: none; }
+        .file-label {
+            display: inline-block;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+        }
+        .file-label:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(102,126,234,0.4); }
+        .file-name { margin-top: 15px; color: #718096; font-size: 1.2rem; }
+        .text-input {
+            width: 100%;
+            max-width: 350px;
+            min-height: 56px;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            resize: vertical;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+        .text-input:focus { outline: none; border-color: #667eea; }
+        .analyze-btn {
+            padding: 16px 48px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.3rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        .analyze-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(245,87,108,0.4); }
+        .analyze-btn:disabled { background: #cbd5e0; cursor: not-allowed; transform: none; box-shadow: none; }
+        .error { color: #e53e3e; margin-top: 30px; font-size: 1.1rem; display: none; }
+        .result-section { display: none; animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .result-header { text-align: center; margin-bottom: 30px; }
+        .result-header h2 { font-size: 2rem; color: white; margin-bottom: 10px; }
+        .result-header p { color: rgba(255,255,255,0.9); font-size: 1.1rem; }
+        .result-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 30px;
+        }
+        .card {
+            background: white;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            height: 100%;
+        }
+        .card:hover { transform: translateY(-5px); }
+        .card-header { display: flex; align-items: center; margin-bottom: 25px; }
+        .card-icon { font-size: 2.2rem; margin-right: 15px; }
+        .card-title { font-size: 1.5rem; font-weight: 600; color: #4a5568; }
+        .card-content { min-height: 220px; }
+        .result-list { list-style: none; }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 14px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .result-item:last-child { border-bottom: none; }
+        .result-word { font-weight: 500; color: #2d3748; font-size: 1.2rem; }
+        .result-value { color: #718096; font-weight: 600; font-size: 1.2rem; }
+        .sentiment-result { display: flex; flex-direction: column; gap: 12px; }
+        .sentiment-score {
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            padding: 12px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .sentiment-label {
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 600;
+            padding: 12px;
+            border-radius: 15px;
+            background: #f7fafc;
+        }
+        .sentiment-positive { color: #38a169; background: #f0fff4; }
+        .sentiment-negative { color: #e53e3e; background: #fff5f5; }
+        .sentiment-neutral { color: #718096; background: #f7fafc; }
+        .sentiment-stats {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            padding: 16px;
+            background: #f7fafc;
+            border-radius: 18px;
+        }
+        .stat-item { display: flex; flex-direction: column; }
+        .stat-value { font-size: 1.6rem; font-weight: 700; color: #4a5568; }
+        .stat-label { font-size: 1.1rem; color: #718096; }
+        .sentiment-bar-container { margin-top: 8px; padding-top: 12px; border-top: 1px solid #e2e8f0; }
+        .sentiment-bar-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: #718096; }
+        .sentiment-bar {
+            position: relative;
+            height: 12px;
+            background: linear-gradient(to right, #3b82f6, #ef4444);
+            border-radius: 6px;
+            margin: 4px 0;
+        }
+        .sentiment-bar-marker {
+            position: absolute;
+            top: -4px;
+            width: 3px;
+            height: 20px;
+            background: #1a202c;
+            border-radius: 2px;
+            transform: translateX(-50%);
+            transition: left 0.3s ease;
+        }
+        .sentiment-bar-score { text-align: center; font-size: 0.9rem; font-weight: 600; color: #2d3748; }
+        .sentiment-comment {
+            margin-top: 8px;
+            padding: 10px 14px;
+            background: #f7fafc;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            color: #4a5568;
+            line-height: 1.6;
+            text-align: center;
+            border-left: 3px solid #667eea;
+        }
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2.8rem; }
+            .header p { font-size: 1.1rem; }
+            .input-methods { flex-direction: column; gap: 10px; }
+            .result-cards { grid-template-columns: 1fr; }
+            .card { padding: 30px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>LexiScope</h1>
+            <p>智能文本洞察者 - 深度分析文本内容，提取关键信息，洞察情感倾向</p>
+        </div>
+        <div class="upload-section">
+            <div class="input-methods">
+                <button class="method-btn active" data-method="text">直接输入</button>
+                <button class="method-btn" data-method="file">上传文档</button>
+            </div>
+            <div class="file-input-container">
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileInput" class="file-input" accept=".txt,.docx">
+                    <label for="fileInput" class="file-label">选择文件</label>
+                </div>
+                <span class="file-name" id="fileName">未选择文件</span>
+            </div>
+            <div class="text-input-container active">
+                <textarea id="textInput" class="text-input" placeholder="请在此输入或粘贴文本内容..."></textarea>
+            </div>
+            <div id="errorMsg" class="error"></div>
+        </div>
+        <div style="text-align: center; margin-bottom: 30px;">
+            <button id="analyzeBtn" class="analyze-btn">开始分析</button>
+        </div>
+        <div id="resultSection" class="result-section">
+            <div class="result-header">
+                <h2>分析结果</h2>
+                <p>以下是您的文本深度分析报告</p>
+            </div>
+            <div class="result-cards">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-icon">📊</span>
+                        <h2 class="card-title">词频统计</h2>
+                    </div>
+                    <div class="card-content"><ul id="wordFreqList" class="result-list"></ul></div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-icon">🏷️</span>
+                        <h2 class="card-title">关键词提取</h2>
+                    </div>
+                    <div class="card-content"><ul id="keywordsList" class="result-list"></ul></div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-icon">❤️</span>
+                        <h2 class="card-title">情感分析</h2>
+                    </div>
+                    <div class="card-content"><div id="sentimentResult" class="sentiment-result"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var methodBtns = document.querySelectorAll('.method-btn');
+        var fileInputContainer = document.querySelector('.file-input-container');
+        var textInputContainer = document.querySelector('.text-input-container');
+        var fileInput = document.getElementById('fileInput');
+        var textInput = document.getElementById('textInput');
+        var fileName = document.getElementById('fileName');
+        var errorMsg = document.getElementById('errorMsg');
+        var analyzeBtn = document.getElementById('analyzeBtn');
+        var resultSection = document.getElementById('resultSection');
+
+        for (var i = 0; i < methodBtns.length; i++) {
+            methodBtns[i].addEventListener('click', function() {
+                for (var j = 0; j < methodBtns.length; j++) {
+                    methodBtns[j].classList.remove('active');
+                }
+                this.classList.add('active');
+                if (this.dataset.method === 'file') {
+                    fileInputContainer.classList.add('active');
+                    textInputContainer.classList.remove('active');
+                } else {
+                    fileInputContainer.classList.remove('active');
+                    textInputContainer.classList.add('active');
+                }
+            });
+        }
+
+        fileInput.addEventListener('change', function(e) {
+            var selectedFile = e.target.files[0];
+            fileName.textContent = selectedFile ? selectedFile.name : '未选择文件';
+        });
+
+        function renderWordFreq(wordFreq) {
+            var list = document.getElementById('wordFreqList');
+            list.innerHTML = '';
+            if (!wordFreq || Object.keys(wordFreq).length === 0) {
+                list.innerHTML = '<li class="result-item">暂无数据</li>';
+                return;
+            }
+            var keys = Object.keys(wordFreq);
+            for (var i = 0; i < keys.length; i++) {
+                var word = keys[i];
+                var count = wordFreq[word];
+                var li = document.createElement('li');
+                li.className = 'result-item';
+                li.innerHTML = '<span class="result-word">' + word + '</span><span class="result-value">' + count + '</span>';
+                list.appendChild(li);
+            }
+        }
+
+        function renderKeywords(keywords) {
+            var list = document.getElementById('keywordsList');
+            list.innerHTML = '';
+            if (!keywords || Object.keys(keywords).length === 0) {
+                list.innerHTML = '<li class="result-item">暂无数据</li>';
+                return;
+            }
+            var keys = Object.keys(keywords);
+            for (var i = 0; i < keys.length; i++) {
+                var word = keys[i];
+                var weight = keywords[word];
+                var displayWeight = typeof weight === 'number' ? weight.toFixed(3) : weight;
+                var li = document.createElement('li');
+                li.className = 'result-item';
+                li.innerHTML = '<span class="result-word">' + word + '</span><span class="result-value">' + displayWeight + '</span>';
+                list.appendChild(li);
+            }
+        }
+
+        function renderSentiment(sentiment) {
+            var result = document.getElementById('sentimentResult');
+            result.innerHTML = '';
+            if (!sentiment || sentiment.score_int === undefined) {
+                result.innerHTML = '<div class="sentiment-score">暂无数据</div>';
+                return;
+            }
+            var scoreInt = sentiment.score_int;
+            var label = sentiment.label || '中性';
+            var pos = sentiment.pos || 0;
+            var neg = sentiment.neg || 0;
+            var comment = sentiment.comment || '';
+
+            var labelClass = 'sentiment-neutral';
+            if (label === '积极') labelClass = 'sentiment-positive';
+            if (label === '消极') labelClass = 'sentiment-negative';
+
+            var leftPercent = ((scoreInt + 100) / 200) * 100;
+            if (leftPercent < 0) leftPercent = 0;
+            if (leftPercent > 100) leftPercent = 100;
+
+            result.innerHTML = 
+                '<div class="sentiment-score">得分: ' + scoreInt + '</div>' +
+                '<div class="sentiment-label ' + labelClass + '">' + label + '</div>' +
+                '<div class="sentiment-stats">' +
+                    '<div class="stat-item"><span class="stat-value">' + pos + '</span><span class="stat-label">正面词</span></div>' +
+                    '<div class="stat-item"><span class="stat-value">' + neg + '</span><span class="stat-label">负面词</span></div>' +
+                '</div>' +
+                '<div class="sentiment-bar-container">' +
+                    '<div class="sentiment-bar-labels"><span>-100</span><span>0</span><span>+100</span></div>' +
+                    '<div class="sentiment-bar">' +
+                        '<div class="sentiment-bar-marker" style="left:' + leftPercent.toFixed(1) + '%;"></div>' +
+                    '</div>' +
+                    '<div class="sentiment-bar-score">当前得分: ' + scoreInt + ' 分</div>' +
+                '</div>' +
+                (comment ? '<div class="sentiment-comment">📝 ' + comment + '</div>' : '');
+        }
+
+        function performAnalysis(text) {
+            errorMsg.style.display = 'none';
+            analyzeBtn.disabled = true;
+            analyzeBtn.textContent = '分析中...';
+
+            fetch('/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: text })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                analyzeBtn.disabled = false;
+                analyzeBtn.textContent = '开始分析';
+                if (data.error) {
+                    errorMsg.textContent = data.error;
+                    errorMsg.style.display = 'block';
+                } else {
+                    renderWordFreq(data.word_freq);
+                    renderKeywords(data.keywords);
+                    renderSentiment(data.sentiment);
+                    resultSection.style.display = 'block';
+                    resultSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            })
+            .catch(function(err) {
+                analyzeBtn.disabled = false;
+                analyzeBtn.textContent = '开始分析';
+                errorMsg.textContent = '请求失败，请检查网络或服务器';
+                errorMsg.style.display = 'block';
+            });
+        }
+
+        analyzeBtn.addEventListener('click', function() {
+            var text = '';
+            if (fileInputContainer.classList.contains('active')) {
+                if (fileName.textContent === '未选择文件' || !fileInput.files[0]) {
+                    errorMsg.textContent = '请上传文件';
+                    errorMsg.style.display = 'block';
+                    return;
+                }
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    performAnalysis(e.target.result);
+                };
+                reader.readAsText(fileInput.files[0], 'UTF-8');
+            } else {
+                text = textInput.value.trim();
+                if (!text) {
+                    errorMsg.textContent = '请输入文本内容';
+                    errorMsg.style.display = 'block';
+                    return;
+                }
+                performAnalysis(text);
+            }
+        });
+    </script>
+</body>
+</html>
+"""
+
+# ============================================================
+# === 队员E 模块结束 ===
+# ============================================================
