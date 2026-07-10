@@ -107,7 +107,7 @@ def function_name(text):
 
 ---
 
-## 6. 当前项目维护者（团队分工）
+## 6. 初始项目团队
 
 | 角色 | 负责模块 | GitHub 账号 |
 | :--- | :--- | :--- |
@@ -118,6 +118,12 @@ def function_name(text):
 | **项目负责人 / 前端兼整合官** | HTML/CSS/JS、最终代码合并 | melody649 |
 
 提交 PR 时，请根据修改内容，请求对应模块的负责人进行 Review。
+
+## 项目治理（Governance）
+
+- **项目负责人（Maintainer）**：拥有最终决策权，负责版本发布、PR 合并和方向把控。
+- **核心开发者（Core Contributors）**：五位原始团队成员，拥有代码审查权限，参与重要决策。
+- **外部贡献者（External Contributors）**：非常欢迎提交 PR，需经过至少一位核心开发者的 Review 后方可合并。
 
 ---
 
